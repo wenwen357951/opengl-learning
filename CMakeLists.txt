@@ -23,5 +23,5 @@ set(
 )
 
 # Build
-add_executable(opengl_learn_project ${opengl_learn_project_src})
-target_link_libraries(opengl_learn_project ${OPENGL_LIBRARIES} glfw)
+add_executable(${PROJECT_NAME} ${opengl_learn_project_src})
+target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} glfw)

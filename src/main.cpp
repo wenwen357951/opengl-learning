@@ -104,21 +104,23 @@ int main()
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
 
-    // 綁定 VAO 與 VBO (使用 GL_ARRAY_BUFFER)
+    // 綁定 VAO, VBO 與 EBO
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     // 將頂點資料複製到 VBO
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    // 將順序資料複製到 EBO
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
 
     // 設定頂點屬性指標，告知 OpenGL 如何解析頂點數據
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), static_cast<void*>(nullptr));
     // 啟用頂點屬性，讓 OpenGL 知道去使用
     glEnableVertexAttribArray(0);
 
-    // 解除綁定 VBO 和 VAO，就不會不小心修改到以創建的 VAO 與 VBO
+#include <cmath>
+#include <iostream>    // 解除綁定 VBO, VAO, EBO，就不會不小心修改到
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -136,6 +138,7 @@ int main()
         glBindVertexArray(VAO);
         // 繪製三角形，使用 GL_TRIANGLES 模式，從頂點 0 開始繪製 3 個頂點
         // glDrawArrays(GL_TRIANGLES, 0, 3);
+        // 改為按照已排定的順序，繪製三角形
         glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
         // 交換前緩衝區，顯示選染結果
         glfwSwapBuffers(window);
@@ -144,7 +147,7 @@ int main()
         glfwPollEvents();
     }
 
-    // 刪除 VAO、VBO 與著色器程序
+    // 刪除 VAO, VBO, EBO 與著色器程序
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
