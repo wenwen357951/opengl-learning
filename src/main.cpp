@@ -83,21 +83,35 @@ int main()
     {
         -0.5f, -0.5f * static_cast<float>(sqrt(3)) / 3, 0.0f, // 第一個頂點 (左下)
         0.5f, -0.5f * static_cast<float>(sqrt(3)) / 3, 0.0f, // 第二個頂點 (右下)
-        0.0f, 0.5f * static_cast<float>(sqrt(3)) * 2 / 3, 0.0f // 第三個頂點 (上方)
+        0.0f, 0.5f * static_cast<float>(sqrt(3)) * 2 / 3, 0.0f, // 第三個頂點 (上方)
+        -0.5f / 2, 0.5f * static_cast<float>(sqrt(3)) / 6, 0.0f, // 第四個頂點 (內部左邊)
+        0.5f / 2, 0.5f * static_cast<float>(sqrt(3)) / 6, 0.0f, // 第五個頂點 (內部右邊)
+        -0.0f, -0.5f * static_cast<float>(sqrt(3)) / 3, 0.0f, // 第六個頂點 (內部下方)
+    };
+
+    GLuint indices[] =
+    {
+        0, 3, 5,
+        3, 2, 4,
+        5, 4, 1
     };
 
     // 建立頂點陣列物件 (Vertex Array Object, VAO) 與頂點緩衝物件 (Vertex Buffer Object, VBO)
+    // 元件緩衝物件 (Element Buffer Object, EBO)
     // 各別只有一個物件
-    GLuint VAO, VBO;
+    GLuint VAO, VBO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
 
     // 綁定 VAO 與 VBO (使用 GL_ARRAY_BUFFER)
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
     // 將頂點資料複製到 VBO
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // 設定頂點屬性指標，告知 OpenGL 如何解析頂點數據
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), static_cast<void*>(nullptr));
@@ -107,6 +121,7 @@ int main()
     // 解除綁定 VBO 和 VAO，就不會不小心修改到以創建的 VAO 與 VBO
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     // 主迴圈
     while (!glfwWindowShouldClose(window))
@@ -120,7 +135,8 @@ int main()
         // 綁定 VAO 讓 OpenGL 使用
         glBindVertexArray(VAO);
         // 繪製三角形，使用 GL_TRIANGLES 模式，從頂點 0 開始繪製 3 個頂點
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        // glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
         // 交換前緩衝區，顯示選染結果
         glfwSwapBuffers(window);
 
@@ -131,6 +147,7 @@ int main()
     // 刪除 VAO、VBO 與著色器程序
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
     glDeleteProgram(shaderProgram);
 
     // 刪除 GLFW 視窗
